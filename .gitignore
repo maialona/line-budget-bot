@@ -1,0 +1,67 @@
+# -------------------------
+# OS / Editor 垃圾檔
+# -------------------------
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+
+# -------------------------
+# 一般 Node 專案
+# -------------------------
+node_modules/
+
+# 日誌檔
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 編譯產物 / 暫存
+dist/
+build/
+.cache/
+.vite/
+*.tsbuildinfo
+
+# 測試覆蓋率
+coverage/
+.nyc_output/
+
+# -------------------------
+# 環境變數（機密）
+#   注意：保留 *.example 方便設定
+# -------------------------
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.local.example
+
+# -------------------------
+# Prisma / DB（如果有用到本機 sqlite）
+# -------------------------
+prisma/dev.db
+prisma/dev.db-journal
+
+# -------------------------
+# backend 專案（保險再加一次目錄級）
+# -------------------------
+line-budget-bot-backend/node_modules/
+line-budget-bot-backend/dist/
+line-budget-bot-backend/coverage/
+
+# 如果 backend 也有本機 sqlite DB
+line-budget-bot-backend/prisma/dev.db
+line-budget-bot-backend/prisma/dev.db-journal
+
+# -------------------------
+# frontend 專案（Vite + React）
+# -------------------------
+line-budget-dashboard-frontend/node_modules/
+line-budget-dashboard-frontend/dist/
+line-budget-dashboard-frontend/.vite/
+line-budget-dashboard-frontend/coverage/

@@ -1,0 +1,63 @@
+// Prisma schema that maps to the PostgreSQL design we discussed.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  lineUserId          String    @unique
+  displayName         String?
+  currency            String    @default("TWD")
+  monthlyBudgetAmount Decimal?  @db.Decimal(12, 2)
+  budgetCycleDay      Int?
+  dailyReminderTime   String?   // stored as "HH:MM" (e.g. "21:30")
+  isReminderEnabled   Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  categories          Category[]
+  expenses            Expense[]
+}
+
+model Category {
+  id         Int       @id @default(autoincrement())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+  name       String
+  emoji      String?
+  isDefault  Boolean   @default(false)
+  sortOrder  Int?
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  expenses   Expense[]
+
+  @@unique([userId, name])
+}
+
+model Expense {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+  amount      Decimal   @db.Decimal(12, 2)
+  currency    String    @default("TWD")
+  spentAt     DateTime
+  note        String?
+  source      String?
+  rawText     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId, spentAt])
+  @@index([userId, categoryId, spentAt])
+}

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+
+    // 🔑 重點 1：改成 node，順便解決 resolveJsonModule 的抱怨
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+
+    "isolatedModules": true,
+    "noEmit": true,
+
+    // 🔑 重點 2：使用 React JSX runtime
+    "jsx": "react-jsx",
+
+    // 🔑 重點 3：把 React 的型別也加進來
+    "types": ["vite/client", "react", "react-dom"]
+  },
+  "include": ["src"]
+}
