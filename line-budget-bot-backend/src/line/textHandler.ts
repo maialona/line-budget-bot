@@ -11,7 +11,7 @@ import {
 import { setMonthlyBudget } from "../services/budget";
 
 const FRONTEND_ORIGIN =
-  process.env.FRONTEND_ORIGIN || "https://your-dashboard.com";
+  process.env.FRONTEND_ORIGIN || "https://line-budget-bot.vercel.app";
 
 // 把 LINE WebhookEvent 收窄成「文字訊息事件」
 type TextMessageEvent = LineEvent & {
