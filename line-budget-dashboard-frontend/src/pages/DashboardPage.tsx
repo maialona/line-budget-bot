@@ -15,6 +15,8 @@ import { DailyChart } from "../components/DailyChart";
 import { RecentTable } from "../components/RecentTable";
 import BudgetSettings from "../components/BudgetSettings";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+
 function getStoredToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("line_budget_token");
@@ -152,7 +154,7 @@ export function DashboardPage() {
 
   const handleLoginClick = () => {
     // Vite dev 會把這個 proxy 到 http://localhost:3000/auth/line/login
-    window.location.href = "/auth/line/login";
+    window.location.href = `${API_BASE}/auth/line/login`;
   };
 
   const handleLogoutClick = () => {
