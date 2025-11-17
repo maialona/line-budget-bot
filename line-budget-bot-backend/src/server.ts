@@ -1,6 +1,7 @@
 // src/server.ts
 // Express app setup（LINE Webhook + LINE Login + Dashboard API）
 
+import cors from "cors";
 import express, { type Request } from "express";
 import { middleware, Client } from "@line/bot-sdk";
 import jwt from "jsonwebtoken";
@@ -59,6 +60,12 @@ function signUserToken(userId: number, lineUserId: string) {
 export function createServer() {
   const app = express();
 
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_ORIGIN ?? "http://localhost:5173",
+    })
+  );
+
   // ⚠️ 不要在 LINE middleware 之前使用 express.json()
   // LINE 需要原始 body 來做簽章驗證，若先被解析會造成 signature 驗證失敗。
 
@@ -88,10 +95,7 @@ export function createServer() {
                   "- 記帳\n- 本月統計\n- 設定預算",
               });
             }
-          } else if (
-            event.type === "message" &&
-            event.message.type === "text"
-          ) {
+          } else if (event.type === "message") {
             await handleTextMessage(lineClient, event);
           }
         })
