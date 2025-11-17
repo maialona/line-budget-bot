@@ -1,5 +1,9 @@
 // src/api/dashboard.ts
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL ?? "";
+
+/* ========= 型別 ========= */
+
 export interface DashboardResponse {
   user: {
     id: number;
@@ -29,33 +33,37 @@ export interface DashboardResponse {
     date: string;
     total: number;
   }[];
-  recentExpenses: {
-    id: number;
-    spentAt: string;
-    categoryName: string;
-    amount: number;
-    note: string | null;
-  }[];
+  recentExpenses: RecentExpense[];
 }
+
+export interface RecentExpense {
+  id: number;
+  spentAt: string; // ISO string
+  categoryName: string;
+  amount: number;
+  note: string | null;
+}
+
+/* ========= 共用：取得 token ========= */
 
 function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("line_budget_token");
 }
 
-// 抓 Dashboard 資料
+/* ========= Dashboard 相關 ========= */
+
 export async function fetchDashboard(
-  tokenOverride?: string
+  token?: string
 ): Promise<DashboardResponse> {
-  const token = tokenOverride ?? getAuthToken();
-  if (!token) {
+  const authToken = token ?? getAuthToken();
+  if (!authToken) {
     throw new Error("unauthorized");
   }
 
-  const res = await fetch("/api/dashboard", {
+  const res = await fetch(`${BASE_URL}/api/dashboard`, {
     headers: {
-      Authorization: `Bearer ${token}`,
-      "Cache-Control": "no-cache",
+      Authorization: `Bearer ${authToken}`,
     },
   });
 
@@ -70,17 +78,15 @@ export async function fetchDashboard(
   return res.json();
 }
 
-// 更新每月預算
 export async function updateMonthlyBudget(
   token: string,
   monthlyBudgetAmount: number | null
 ): Promise<{ monthlyBudgetAmount: number | null }> {
-  const res = await fetch("/api/user/budget", {
+  const res = await fetch(`${BASE_URL}/api/user/budget`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
-      "Cache-Control": "no-cache",
     },
     body: JSON.stringify({ monthlyBudgetAmount }),
   });
@@ -92,15 +98,14 @@ export async function updateMonthlyBudget(
   return res.json();
 }
 
-// 方便型別使用：單筆「最近支出」的型別
-export type RecentExpense = DashboardResponse["recentExpenses"][number];
+/* ========= 單筆支出：編輯 / 刪除 ========= */
 
 export async function updateExpense(
   token: string,
-  id: number,
-  payload: { amount: number; note: string | null }
+  expenseId: number,
+  payload: { amount?: number; note?: string | null }
 ): Promise<RecentExpense> {
-  const res = await fetch(`/api/expenses/${id}`, {
+  const res = await fetch(`${BASE_URL}/api/expenses/${expenseId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -109,10 +114,6 @@ export async function updateExpense(
     body: JSON.stringify(payload),
   });
 
-  if (res.status === 401) {
-    throw new Error("unauthorized");
-  }
-
   if (!res.ok) {
     throw new Error("update_expense_failed");
   }
@@ -120,19 +121,18 @@ export async function updateExpense(
   return res.json();
 }
 
-export async function deleteExpense(token: string, id: number): Promise<void> {
-  const res = await fetch(`/api/expenses/${id}`, {
+export async function deleteExpense(
+  token: string,
+  expenseId: number
+): Promise<void> {
+  const res = await fetch(`${BASE_URL}/api/expenses/${expenseId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  if (res.status === 401) {
-    throw new Error("unauthorized");
-  }
-
-  if (!res.ok && res.status !== 204) {
+  if (!res.ok) {
     throw new Error("delete_expense_failed");
   }
 }
